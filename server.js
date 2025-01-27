@@ -74,11 +74,17 @@ app.post("/generate-pdf", async (req, res) => {
   };
   // Regroup the hotels by ID
   const groupedHotels = groupById(invoiceData);
-  const printDate = '31.12.2024'
+  // const printDate = '31.12.2024'
+
   try {
     // Generate PDFs for family groups
     for (let group of groupedHotels) {
-      const invoiceNumber = `L066${pdfPaths.length + 1}`;
+      const printDate = group[0]?.createDate
+        ? formatDate(excelDateToJSDate(group[0].createDate))
+        : formatDate(new Date());
+
+      const invoiceNumber = `${group[0]?.invoiceNumber || 'L0000'}${pdfPaths.length + 1}`;
+
       const htmlContent = `
 
       <!DOCTYPE html>
