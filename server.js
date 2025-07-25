@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Function to get Base64 from image file
+
 async function getBase64FromFile(filePath) {
   return new Promise((resolve, reject) => {
     fs.readFile(filePath, (err, data) => {
@@ -30,13 +30,11 @@ app.post("/generate-pdf", async (req, res) => {
     args: ["--allow-file-access-from-files", "--enable-local-file-accesses"],
   });
 
-  const logoPath = path.join(__dirname, "What.jpg"); // Adjust the path to your image
+  const logoPath = path.join(__dirname, "Logo.jpg");
   const logo = await getBase64FromFile(logoPath);
 
-  const pdfPaths = []; // Array to store generated PDF paths
-  // console.log(families, singles);
+  const pdfPaths = [];
 
-  // Function to group by ID
   function groupById(invoiceData) {
     const grouped = {};
 
@@ -75,6 +73,13 @@ app.post("/generate-pdf", async (req, res) => {
   // Regroup the hotels by ID
   const groupedHotels = groupById(invoiceData);
   // const printDate = '31.12.2024'
+
+  const formatNumber = (num) => {
+    if (num === undefined || num === null || num === '' || num === ' ') {
+      return ' ';
+    }
+    return Math.round(num);
+  };
 
   try {
     // Generate PDFs for family groups
@@ -269,14 +274,14 @@ app.post("/generate-pdf", async (req, res) => {
             .map(
               (row) => `
               <tr>
-                <td>wyndham batumi</td>
+                <td>${row.hotel}</td>
                 <td>${formatDate(excelDateToJSDate(row.startDate))}</td>
                 <td>${formatDate(excelDateToJSDate(row.endDate))}</td>
                 <td>${row.nights}</td>
                 <td>${row.typeOfRoom}</td>
                 <td>${row.hotelPricesPerOneDay}</td>
-                <td>${row.transfer}</td>
-                <td>${row.total}</td>
+                <td>${formatNumber(row.transfer)}</td>
+                <td>${formatNumber(row.total)}</td>
               </tr>
             `
             )
@@ -290,7 +295,7 @@ app.post("/generate-pdf", async (req, res) => {
       </p>
 
       <div class="total">TOTAL: <span>
-       $${group.reduce((acc, member) => acc + member.total, 0)}
+       $${formatNumber(group.reduce((acc, member) => acc + member.total, 0))}
       </span></div>
 
       <div class="signature-section">
@@ -301,10 +306,10 @@ app.post("/generate-pdf", async (req, res) => {
 
       <div class="bank-details">
         <p>Name of Beneficiary: <strong>Yuli Tour LLC</strong></p>
-        <p>Beneficiary’s Bank:<strong>JSC Credo Bank</strong></p>
+        <p>Beneficiary's Bank:<strong>JSC Credo Bank</strong></p>
         <p class="padding_left"><strong>Batumi, Georgia</strong></p>
         <p class="padding_left"><strong>Swift: JSCRGE22</strong></p>
-        <p>Ben’s IBAN:<strong>GE26CD0360000039174901</strong></p>
+        <p>Ben's IBAN:<strong>GE26CD0360000039174901</strong></p>
       </div>
     </div>
   </body>
@@ -489,14 +494,14 @@ app.post("/generate-pdf", async (req, res) => {
             .map(
               (row) => `
               <tr>
-                <td>wyndham batumi</td>
+                <td>${row.hotel}</td>
                 <td>${formatDate(excelDateToJSDate(row.startDate))}</td>
                 <td>${formatDate(excelDateToJSDate(row.endDate))}</td>
                 <td>${row.nights}</td>
                 <td>${row.typeOfRoom}</td>
                 <td>${row.hotelPricesPerOneDay}</td>
-                <td>${row.transfer}</td>
-                <td>${row.total}</td>
+                <td>${formatNumber(row.transfer)}</td>
+                <td>${formatNumber(row.total)}</td>
               </tr>
             `
             )
@@ -562,7 +567,7 @@ app.post("/generate-pdf", async (req, res) => {
     await browser.close(); // Ensure the browser is closed after all operations
   }
 });
-
-app.listen(3000, () => {
-  console.log("Server running on port 3000");
+// const server = 3001
+app.listen(3001, () => {
+  console.log("Server running on port 3001");
 });
